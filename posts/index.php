@@ -4,41 +4,40 @@ session_start();
 
 require_once "../config/database.php";
 
+// 1. Authentication check
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../auth/login.php");
     exit();
 }
 
-/* =========================
-   SEARCH
-========================= */
+// 2. Generate CSRF token
+if (empty($_SESSION["csrf_token"])) {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+}
 
+// 3. Search input validation
 $search = "";
 
-if (isset($_GET["search"])) {
+if (isset($_GET["search"]) && is_string($_GET["search"])) {
     $search = trim($_GET["search"]);
 }
 
-/* =========================
-   PAGINATION
-========================= */
+// Limit search length
+if (strlen($search) > 200) {
+    $search = substr($search, 0, 200);
+}
 
+// 4. Pagination validation
 $postsPerPage = 5;
 
-$page = isset($_GET["page"]) ? (int)$_GET["page"] : 1;
+$page = filter_input(INPUT_GET, "page", FILTER_VALIDATE_INT);
 
-if ($page < 1) {
+if ($page === false || $page === null || $page < 1) {
     $page = 1;
 }
 
-$offset = ($page - 1) * $postsPerPage;
-
-/* =========================
-   COUNT POSTS
-========================= */
-
+// 5. Count posts
 if ($search !== "") {
-
     $searchTerm = "%" . $search . "%";
 
     $countStmt = $conn->prepare(
@@ -47,11 +46,16 @@ if ($search !== "") {
          WHERE title LIKE ? OR content LIKE ?"
     );
 
-    $countStmt->bind_param("ss", $searchTerm, $searchTerm);
+    $countStmt->bind_param(
+        "ss",
+        $searchTerm,
+        $searchTerm
+    );
+
     $countStmt->execute();
 
     $countResult = $countStmt->get_result();
-    $totalPosts = $countResult->fetch_assoc()["total"];
+    $totalPosts = (int) $countResult->fetch_assoc()["total"];
 
     $countStmt->close();
 
@@ -61,26 +65,27 @@ if ($search !== "") {
         "SELECT COUNT(*) AS total FROM posts"
     );
 
-    $totalPosts = $countResult->fetch_assoc()["total"];
+    $totalPosts = (int) $countResult->fetch_assoc()["total"];
 }
 
-/* =========================
-   TOTAL PAGES
-========================= */
+// 6. Calculate total pages
+$totalPages = (int) ceil($totalPosts / $postsPerPage);
 
-$totalPages = ceil($totalPosts / $postsPerPage);
+// Keep requested page within valid range
+if ($totalPages > 0 && $page > $totalPages) {
+    $page = $totalPages;
+}
 
-/* =========================
-   FETCH POSTS
-========================= */
+$offset = ($page - 1) * $postsPerPage;
 
+// 7. Fetch posts using prepared statements
 if ($search !== "") {
 
     $stmt = $conn->prepare(
         "SELECT id, title, content, created_at
          FROM posts
          WHERE title LIKE ? OR content LIKE ?
-         ORDER BY created_at DESC
+         ORDER BY created_at DESC, id DESC
          LIMIT ? OFFSET ?"
     );
 
@@ -92,16 +97,12 @@ if ($search !== "") {
         $offset
     );
 
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-
 } else {
 
     $stmt = $conn->prepare(
         "SELECT id, title, content, created_at
          FROM posts
-         ORDER BY created_at DESC
+         ORDER BY created_at DESC, id DESC
          LIMIT ? OFFSET ?"
     );
 
@@ -110,10 +111,18 @@ if ($search !== "") {
         $postsPerPage,
         $offset
     );
+}
 
-    $stmt->execute();
+$stmt->execute();
+$result = $stmt->get_result();
 
-    $result = $stmt->get_result();
+// Helper for safely displaying HTML text
+function e($value) {
+    return htmlspecialchars(
+        (string) $value,
+        ENT_QUOTES | ENT_SUBSTITUTE,
+        "UTF-8"
+    );
 }
 
 ?>
@@ -122,15 +131,12 @@ if ($search !== "") {
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Posts - ApexPlanet Task 3</title>
+    <title>Posts - ApexPlanet Task 4</title>
 
     <link rel="stylesheet" href="../style.css">
-
 </head>
 
 <body>
@@ -142,20 +148,19 @@ if ($search !== "") {
     <p>
         Welcome,
         <strong>
-            <?php echo htmlspecialchars($_SESSION["username"]); ?>
+            <?php echo e($_SESSION["username"] ?? "User"); ?>
         </strong>
     </p>
 
     <!-- Navigation -->
-
-    <a href="create.php">Create New Post</a> |
-
-    <a href="../auth/logout.php">Logout</a>
+    <nav>
+        <a href="create.php">Create New Post</a> |
+        <a href="../auth/logout.php">Logout</a>
+    </nav>
 
     <hr>
 
     <!-- Search Form -->
-
     <form method="GET" action="index.php">
 
         <label for="search">Search Posts</label>
@@ -164,20 +169,15 @@ if ($search !== "") {
             type="text"
             id="search"
             name="search"
+            maxlength="200"
             placeholder="Search by title or content..."
-            value="<?php echo htmlspecialchars($search); ?>"
+            value="<?php echo e($search); ?>"
         >
 
-        <button type="submit">
-            Search
-        </button>
+        <button type="submit">Search</button>
 
         <?php if ($search !== ""): ?>
-
-            <a href="index.php">
-                Clear Search
-            </a>
-
+            <a href="index.php">Clear Search</a>
         <?php endif; ?>
 
     </form>
@@ -185,50 +185,56 @@ if ($search !== "") {
     <hr>
 
     <!-- Posts -->
-
     <?php if ($result->num_rows > 0): ?>
 
         <?php while ($post = $result->fetch_assoc()): ?>
 
             <article>
 
-                <h2>
-                    <?php echo htmlspecialchars($post["title"]); ?>
-                </h2>
+                <h3>
+                    <?php echo e($post["title"]); ?>
+                </h3>
 
                 <p>
                     <?php
-                    echo nl2br(
-                        htmlspecialchars($post["content"])
-                    );
+                    echo nl2br(e($post["content"]));
                     ?>
                 </p>
 
                 <small>
-
-                    Created:
-                    <?php
-                    echo htmlspecialchars(
-                        $post["created_at"]
-                    );
-                    ?>
-
+                    Created: <?php echo e($post["created_at"]); ?>
                 </small>
 
                 <br><br>
 
-                <a href="edit.php?id=<?php echo $post["id"]; ?>">
+                <a href="edit.php?id=<?php echo (int) $post["id"]; ?>">
                     Edit
                 </a>
 
                 |
 
-                <a
-                    href="delete.php?id=<?php echo $post["id"]; ?>"
-                    onclick="return confirm('Are you sure you want to delete this post?');"
+                <!-- CSRF-protected Delete Form -->
+                <form
+                    method="POST"
+                    action="delete.php"
+                    onsubmit="return confirm('Are you sure you want to delete this post?');"
                 >
-                    Delete
-                </a>
+
+                    <input
+                        type="hidden"
+                        name="id"
+                        value="<?php echo (int) $post["id"]; ?>"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="<?php echo e($_SESSION["csrf_token"]); ?>"
+                    >
+
+                    <button type="submit">Delete</button>
+
+                </form>
 
             </article>
 
@@ -242,9 +248,7 @@ if ($search !== "") {
             <?php if ($search !== ""): ?>
 
                 No posts found for:
-                <strong>
-                    <?php echo htmlspecialchars($search); ?>
-                </strong>
+                <strong><?php echo e($search); ?></strong>
 
             <?php else: ?>
 
@@ -255,41 +259,34 @@ if ($search !== "") {
 
     <?php endif; ?>
 
-
     <!-- Pagination -->
-
     <?php if ($totalPages > 1): ?>
 
         <div class="pagination">
 
             <?php if ($page > 1): ?>
 
-                <a
-                    href="?search=<?php echo urlencode($search); ?>&page=<?php echo $page - 1; ?>"
-                >
+                <a href="?search=<?php echo urlencode($search); ?>&page=<?php echo $page - 1; ?>">
                     &laquo; Previous
                 </a>
 
             <?php endif; ?>
 
-
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
 
                 <a
                     href="?search=<?php echo urlencode($search); ?>&page=<?php echo $i; ?>"
-                    class="<?php echo ($i == $page) ? 'active' : ''; ?>"
+                    class="<?php echo ($i === $page) ? 'active' : ''; ?>"
+                    <?php echo ($i === $page) ? 'aria-current="page"' : ''; ?>
                 >
                     <?php echo $i; ?>
                 </a>
 
             <?php endfor; ?>
 
-
             <?php if ($page < $totalPages): ?>
 
-                <a
-                    href="?search=<?php echo urlencode($search); ?>&page=<?php echo $page + 1; ?>"
-                >
+                <a href="?search=<?php echo urlencode($search); ?>&page=<?php echo $page + 1; ?>">
                     Next &raquo;
                 </a>
 
@@ -302,5 +299,10 @@ if ($search !== "") {
 </div>
 
 </body>
-
 </html>
+
+<?php
+// 8. Close database resources
+$stmt->close();
+$conn->close();
+?>
