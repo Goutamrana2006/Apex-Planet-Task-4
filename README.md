@@ -1,350 +1,308 @@
-InkSpace — Blog Management System
-A secure, database-driven blog management web application developed as part of the ApexPlanet Software Pvt. Ltd. Web Development Internship — Task 5.
-InkSpace allows users to register, log in, create and manage blog posts, search published content, and navigate posts using pagination. The project demonstrates practical web development with PHP, MySQL, HTML, CSS, and JavaScript, along with authentication, CRUD operations, and security-conscious coding practices.
-> **Project:** InkSpace — Blog Management System
-> **Internship:** ApexPlanet Software Pvt. Ltd. — Web Development Internship
-> **Current Task:** Task 5
-> **Development Environment:** Windows + XAMPP
 
-Table of Contents
-Project Overview
-Key Features
-Development Progress: Tasks 1–5
-Technology Stack
-Project Structure
-Requirements
-Installation and Setup
-Database Structure
-Security Practices
-Testing Checklist
-Learning Outcomes
-Future Improvements
-Internship Information
 
-Project Overview
-InkSpace is a web-based blogging application designed to demonstrate the development of a database-driven website using PHP and MySQL.
-Users can create an account, authenticate, publish blog posts, explore available posts, search content, and edit or delete posts through the application interface. The project was developed incrementally, starting with Git and GitHub setup and progressing through authentication, CRUD functionality, search, pagination, interface improvements, and security enhancements.
-The application is developed and tested locally using XAMPP.
-Key Features
-User Authentication
-User registration with a username and password.
-Password hashing with PHP's `password_hash()`.
-Password verification with `password_verify()`.
-Session-based authentication.
-Session ID regeneration after successful login.
-Logout functionality that clears the session.
-Blog Management
-Create new blog posts.
-View posts in the Explore Posts dashboard.
-Edit existing posts.
-Delete posts using a POST request.
-Display post titles, content, and publication dates.
-Search and Navigation
-Search posts by title or content.
-Paginate the list of posts.
-Handle empty search results.
-Validate pagination input.
-User Interface
-Shared CSS styling for a consistent visual experience.
-Styled registration and login pages.
-Responsive styling for the post dashboard and article forms.
-Success and error feedback for supported operations.
-Confirmation before deleting a post.
-Security-Oriented Implementation
-Prepared SQL statements for queries involving user input.
-HTML output escaping using `htmlspecialchars()`.
-CSRF token validation for protected post operations.
-Server-side validation of submitted values.
-Authentication checks on protected pages.
-> **Note:** The feature list describes functionality implemented or worked on during development. Use the testing checklist below to verify the behavior of the current version before describing every item as fully tested.
+# 🔐 Secure Blog Management System
+
+### ApexPlanet Web Development Internship — Task 4
+
+A PHP and MySQL-based blog application enhanced with security-focused practices, including secure session handling, CSRF protection, input validation, and safer database operations.
+
+**Building Better Web Applications Through Secure Coding**
+
+
+
 ---
-Development Progress: Tasks 1–5
-Task 1 — Git and GitHub Setup
-Created and configured a GitHub repository.
-Initialized Git version control.
-Added project files to the repository.
-Practiced committing and pushing code to GitHub.
-Task 2 — Authentication and CRUD Operations
-Implemented user registration and login.
-Added password hashing and password verification.
-Introduced session-based authentication.
-Connected PHP to a MySQL database.
-Implemented blog post creation, listing, editing, and deletion.
-Used prepared statements for database queries involving user input.
-Task 3 — Search, Pagination, and UI Improvements
-Added search by post title and content.
-Implemented pagination for the post listing.
-Added navigation between result pages.
-Improved page layout and styling with CSS.
-Displayed post titles, content, and publication information.
-Worked on empty-result handling and invalid pagination input.
-Task 4 — Security Enhancements
-Security-focused improvements included:
-Checking authentication before serving protected pages.
-Regenerating the session ID after successful login.
-Clearing session data and destroying the session during logout.
-Generating CSRF tokens with PHP's `random_bytes()`.
-Validating submitted CSRF tokens with `hash_equals()`.
-Escaping user-generated content before rendering it in HTML.
-Using prepared statements for user-supplied SQL values.
-Validating post IDs and required fields.
-Using POST requests for post deletion.
-Task 5 — UI Refinement, Feedback, and Finalization
-Work on Task 5 has focused on refining the existing application and preparing it for review:
-Improved styling for the Create Article and Edit Article pages.
-Refined the Explore Posts dashboard layout.
-Added success and error notifications for supported post operations.
-Added automatic dismissal behavior for notifications.
-Reviewed the registration and login page styling.
-Continued checking search, pagination, and post-management workflows.
-Prepared project documentation and a final testing checklist.
-Task 5 should be considered complete only after the required internship deliverables and the current implementation have been tested and verified.
+
+## 📌 Project Overview
+
+This project was developed as part of the **ApexPlanet Software Pvt. Ltd. Web Development Internship**.
+
+The application demonstrates a blog management system built with PHP and MySQL. Task 4 focuses on strengthening the application's security by applying secure coding practices to authentication, session management, form submissions, database queries, and user-generated content.
+
+The project uses XAMPP for local development and testing.
+
+## ✨ Key Features
+
+### 🔐 Authentication and Session Security
+- User registration and login.
+- Password hashing and verification.
+- Session-based authentication.
+- Session ID regeneration after successful login.
+- Session cleanup and logout handling.
+- Authentication checks for protected pages.
+
+### 🛡️ Security Enhancements
+- CSRF token generation and validation for protected operations.
+- Prepared SQL statements for queries involving user input.
+- Server-side validation of submitted data.
+- HTML output escaping to help prevent cross-site scripting (XSS).
+- POST-based deletion of blog posts.
+- Improved error handling to avoid exposing internal database details.
+
+### 📝 Blog Management
+- Create blog posts.
+- View available posts.
+- Edit existing posts.
+- Delete posts through protected operations.
+- Validate post IDs and required fields.
+
+### 🎨 User Interface
+- Login and registration pages.
+- Blog post listing and management pages.
+- CSS-based styling.
+- User feedback for supported operations.
+
+*Features should be verified against the actual code and tested application before being considered fully implemented.*
+
 ---
-Technology Stack
-Category    Technology  Purpose
-Frontend    HTML5   Page structure and forms
-Styling CSS3    Layout, visual design, and responsive styling
-Client-side behavior    JavaScript  Interactive behavior and notification dismissal
-Backend PHP Server-side logic, authentication, and CRUD operations
-Database    MySQL   Persistent storage for users and posts
-Local server    XAMPP (Apache and MySQL)    Local development environment
-Code editor Visual Studio Code  Development and debugging
-Version control Git Tracking code changes
-Repository hosting  GitHub  Hosting and sharing the source code
+
+## 🧰 Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| HTML5 | Web page structure |
+| CSS3 | Styling and layout |
+| JavaScript | Client-side interactions, where implemented |
+| PHP | Server-side application logic |
+| MySQL | Database management |
+| Apache | Local web server |
+| XAMPP | Local development environment |
+| Visual Studio Code | Code editor |
+| Git | Version control |
+| GitHub | Source code hosting |
+
 ---
-Project Structure
-The main application structure is expected to resemble the following. The actual files in the repository may differ as development continues.
+
+## 📁 Project Structure
+
 ```text
-
-ApexPlanet-Task-5/
-
+Apex-Planet-Task-4/
 │
-
 ├── auth/
-
-│   ├── register.php
-
-│   ├── login.php
-
-│   └── logout.php
-
+│   ├── login.php
+│   ├── register.php
+│   └── logout.php
 │
-
 ├── config/
-
-│   └── database.php
-
+│   └── database.php
 │
-
 ├── posts/
-
-│   ├── index.php
-
-│   ├── create.php
-
-│   ├── edit.php
-
-│   ├── delete.php
-
-│   ├── posts.css
-
-│   ├── editor.css
-
-│   └── edit.css
-
+│   ├── index.php
+│   ├── create.php
+│   ├── edit.php
+│   └── delete.php
 │
-
 ├── index.php
-
 ├── style.css
-
 └── README.md
-
 ```
-Keep the structure in this document aligned with the actual repository. Do not commit local configuration secrets, database passwords, or unnecessary environment files.
+
+The structure above is a representative layout. Adjust it to match the actual files in your Task 4 repository.
+
 ---
-Requirements
-Install or have access to:
-Windows, Linux, or macOS.
-XAMPP with Apache, PHP, and MySQL/MariaDB.
-A web browser.
-Visual Studio Code or another code editor.
-Git (optional, for cloning and version control).
+
+## 🔒 Security Implementation
+
+### 1. Password Security
+Passwords should be hashed using PHP's `password_hash()` function and verified using `password_verify()` rather than stored as plaintext.
+
+### 2. SQL Injection Prevention
+Prepared statements are used for database queries involving user-provided values, reducing the risk of SQL injection.
+
+### 3. Session Security
+Session-based authentication protects restricted pages. Regenerating the session ID after successful login helps mitigate session fixation risks.
+
+### 4. Cross-Site Request Forgery (CSRF) Protection
+CSRF tokens should be generated using a cryptographically secure random generator and validated on protected state-changing requests.
+
+### 5. Cross-Site Scripting (XSS) Prevention
+User-generated content should be escaped before being inserted into HTML output, using functions such as `htmlspecialchars()` with appropriate encoding settings.
+
+### 6. Input Validation
+Server-side validation checks submitted values, required fields, and post identifiers before processing operations.
+
+### 7. Safer Post Deletion
+Post deletion should use a POST request, require appropriate authorization, and validate a CSRF token.
+
+**Security note:** These practices help reduce common vulnerabilities, but they do not guarantee that an application is completely secure. Test all protected operations and verify authorization rules before deployment.
+
 ---
-Installation and Setup
-1. Clone the repository
-If the project repository is named `ApexPlanet-Task-5`, run:
+
+## ⚙️ Requirements
+
+- Windows, Linux, or macOS.
+- XAMPP with Apache, PHP, and MySQL/MariaDB.
+- A modern web browser.
+- Visual Studio Code or another code editor.
+- Git, if using GitHub for version control.
+
+---
+
+## 🚀 Installation and Setup
+
+### Step 1: Clone the repository
+
+Replace the repository URL below if your Task 4 repository uses a different name.
+
 ```bash
-
-git clone https://github.com/Goutamrana2006/ApexPlanet-Task-5.git
-
+git clone https://github.com/Goutamrana2006/Apex-Planet-Task-4.git
 ```
-If the repository has a different name or URL, replace the command with the correct repository address.
-Alternatively, download the repository as a ZIP file and extract it.
-2. Place the project in XAMPP
-Copy the project folder into the XAMPP web root. For the folder name shown above, the path is:
+
+Navigate to the project directory:
+
+```bash
+cd Apex-Planet-Task-4
+```
+
+### Step 2: Place the project in XAMPP
+
+For a standard Windows installation, place the project in:
+
 ```text
-
-C:\xampp\htdocs\ApexPlanet-Task-5
-
+C:\xampp\htdocs\Apex-Planet-Task-4
 ```
-Ensure that the folder contains `index.php`, `auth/`, `config/`, and `posts/`.
-3. Start Apache and MySQL
-Open the XAMPP Control Panel.
-Start Apache.
-Start MySQL.
-Confirm that both services start successfully.
-4. Create the database
+
+Ensure that the project files and directories are present.
+
+### Step 3: Start Apache and MySQL
+
+1. Open the XAMPP Control Panel.
+2. Start Apache.
+3. Start MySQL.
+4. Confirm that both services are running.
+
+### Step 4: Create the database
+
 Open phpMyAdmin:
+
 ```text
-
-http://localhost/phpmyadmin
-
+http://localhost/phpmyadmin/
 ```
-Create a database named:
-```text
 
-blog
+Create the database required by your application.
 
-```
-The application expects a `users` table and a `posts` table. Use the actual schema and constraints from your project when creating them; see Database Structure.
-5. Configure the database connection
+If your configuration uses the database name `blog`, create a database named `blog`.
+
+Create the required tables using the schema expected by your PHP code.
+
+### Step 5: Configure the database
+
 Open:
-```text
 
+```text
 config/database.php
-
 ```
-Set the MySQL host, database name, username, and password to match your local XAMPP configuration.
-For a typical local XAMPP installation, the database host is often `localhost` and the database name is `blog`. Use the credentials configured on your own machine.
-Never commit real passwords, API keys, or other private credentials to GitHub.
-6. Run the application
-Open the local project URL in your browser:
+
+Configure the database host, username, password, and database name to match your local environment.
+
+Do not publish real database credentials or other secrets to GitHub.
+
+### Step 6: Run the application
+
+Open the corresponding local URL in your browser:
+
 ```text
-
-http://localhost/ApexPlanet-Task-5/
-
+http://localhost/Apex-Planet-Task-4/
 ```
-Register an account, log in, and test the available blog-management features.
+
+Register an account, log in, and test the available functionality.
+
 ---
-Database Structure
-The application code shared during development uses a `users` table and a `posts` table. The following describes the columns referenced by the shared code; confirm the complete column types, indexes, constraints, and relationships against the database in your current project.
-`users` table
-Column  Purpose
-`id`    Unique user identifier
-`username`  Username used for registration and login
-`password`  Hashed password
-Recommended database considerations:
-Make `id` a primary key.
-Add a unique constraint to `username` if usernames must be unique.
-Store password hashes in a column large enough for hashes produced by PHP's password-hashing API.
-`posts` table
-Column  Purpose
-`id`    Unique post identifier
-`title` Blog post title
-`content`   Blog post body
-`created_at`    Post creation timestamp
-Important: The post queries shared during development select `id`, `title`, `content`, and `created_at`. They do not establish that the current `posts` table has an author or `user_id` column. If the application is intended to support private ownership of posts, review and, if needed, migrate the schema to associate each post with its author before enforcing ownership rules.
+
+## 🧪 Testing Checklist
+
+### Authentication
+- [ ] Register a new account.
+- [ ] Test duplicate username handling.
+- [ ] Log in with valid credentials.
+- [ ] Confirm invalid credentials are rejected.
+- [ ] Verify protected pages require authentication.
+- [ ] Test logout and session cleanup.
+
+### Blog Management
+- [ ] Create a blog post.
+- [ ] View the created post.
+- [ ] Edit an existing post.
+- [ ] Delete a post.
+- [ ] Test invalid post IDs and form inputs.
+- [ ] Verify that users cannot modify posts they do not own, if ownership restrictions apply.
+
+### Security
+- [ ] Verify password hashing.
+- [ ] Test prepared database queries.
+- [ ] Test CSRF validation on protected operations.
+- [ ] Check HTML output escaping.
+- [ ] Verify session ID regeneration after login.
+- [ ] Confirm internal database errors are not exposed to users.
+- [ ] Verify logout invalidates the authenticated session.
+
+### Interface
+- [ ] Check the login and registration pages.
+- [ ] Test the blog management interface.
+- [ ] Verify success and error feedback.
+- [ ] Check layouts on desktop and mobile screens.
+
+Complete each checklist item only after testing it.
+
 ---
-Security Practices
-InkSpace includes security-oriented measures intended to reduce common web application risks.
-Password Handling
-Uses `password_hash()` when registering users.
-Uses `password_verify()` when authenticating users.
-Does not intentionally store plaintext passwords.
-Session Management
-Uses PHP sessions to track authenticated users.
-Regenerates the session ID after successful login.
-Protects pages by checking for an authenticated user.
-The logout implementation is intended to clear session data and destroy the session.
-SQL Injection Prevention
-Uses prepared statements for queries involving user-supplied values.
-Binds values to SQL parameters rather than concatenating those values into query strings.
-Cross-Site Scripting (XSS) Prevention
-Escapes values displayed in HTML with `htmlspecialchars()`.
-The shared post listing uses `ENT_QUOTES` and `ENT_SUBSTITUTE` with UTF-8 output encoding.
-Cross-Site Request Forgery (CSRF) Protection
-Generates session-based tokens with `random_bytes()`.
-Includes tokens in protected post forms.
-Validates submitted tokens using `hash_equals()`.
-Rejects invalid or missing tokens before protected post changes are performed.
-Input Validation and Deletion
-Checks required form fields on the server.
-Validates post IDs as integers.
-Rejects empty post titles and content in the relevant post workflows.
-Uses POST for deletion rather than a direct GET-based delete link.
-Security Limitations and Verification
-These measures improve security but do not guarantee that the application is free of vulnerabilities. Before submission, verify authorization for every post operation, session-cookie configuration, CSRF coverage across all state-changing forms, database constraints, and handling of unexpected input.
-In particular, authentication and ownership are different controls: requiring a user to log in does not by itself prevent that user from editing or deleting another user's post. Confirm that the application enforces ownership if that is a requirement.
+
+## 📚 Learning Outcomes
+
+This task provided an opportunity to practise:
+
+- Secure PHP application development.
+- Session-based authentication.
+- Password hashing and verification.
+- SQL injection prevention using prepared statements.
+- CSRF protection.
+- XSS prevention through output escaping.
+- Server-side input validation.
+- Secure handling of post-management operations.
+- Database integration with MySQL.
+- Debugging and testing with XAMPP.
+- Version control using Git and GitHub.
+
 ---
-Testing Checklist
-Use this checklist before the final submission.
-Authentication
-[ ] Register with valid information.
-[ ] Attempt to register an existing username.
-[ ] Log in with valid credentials.
-[ ] Confirm invalid credentials are rejected.
-[ ] Confirm protected pages redirect unauthenticated users.
-[ ] Log out and verify the session is no longer authenticated.
-Blog Operations
-[ ] Create a post with a valid title and content.
-[ ] Confirm the new post appears in the listing.
-[ ] Edit a post and confirm the changes are displayed.
-[ ] Delete a post and confirm it is removed.
-[ ] Confirm invalid post IDs are handled safely.
-[ ] Verify that users cannot modify posts they do not own, if ownership is part of the application requirements.
-Search and Pagination
-[ ] Search by a matching title.
-[ ] Search by matching content.
-[ ] Search for text that returns no results.
-[ ] Navigate between pagination pages.
-[ ] Test invalid or out-of-range page values.
-Security and Interface
-[ ] Verify password hashes are stored instead of plaintext passwords.
-[ ] Verify CSRF validation for each protected state-changing form.
-[ ] Confirm user-generated text is safely escaped when rendered.
-[ ] Confirm database operations use appropriate prepared statements.
-[ ] Check success and error notifications.
-[ ] Check automatic notification dismissal.
-[ ] Test the layout on desktop and mobile screen sizes.
-[ ] Test the setup instructions using a clean database when possible.
-Mark an item complete only after you have tested it.
+
+## 🔮 Future Improvements
+
+Potential enhancements include:
+
+- More comprehensive authorization and ownership controls.
+- Password recovery.
+- Improved form validation and accessibility.
+- Automated security testing.
+- Additional responsive-design improvements.
+- Deployment to a properly configured production environment.
+
+These are potential improvements rather than claims of existing functionality.
+
 ---
-Learning Outcomes
-During the development of InkSpace, the project provided practice in:
-Building web pages with HTML and CSS.
-Writing server-side PHP code.
-Handling form submissions and validating input.
-Connecting PHP applications to MySQL.
-Implementing CRUD operations.
-Working with password hashing and session-based authentication.
-Using prepared SQL statements.
-Applying CSRF protection and HTML output escaping.
-Debugging a local application with XAMPP.
-Tracking changes with Git and publishing source code on GitHub.
-Improving UI consistency and preparing technical documentation.
+
+## 🏢 Internship Information
+
+| Detail | Information |
+|---|---|
+| Organization | ApexPlanet Software Pvt. Ltd. |
+| Program | Web Development Internship |
+| Task | Task 4 — Security Enhancements |
+| Project | Secure Blog Management System |
+| Primary Technologies | PHP, MySQL, HTML5, CSS3, JavaScript |
+| Development Environment | XAMPP and Visual Studio Code |
+| Version Control | Git and GitHub |
+
 ---
-Future Improvements
-Possible future enhancements include:
-A dedicated article details page.
-A My Articles page for each user's own posts.
-Author profiles and accurate author attribution.
-Categories and tags.
-Comments and likes.
-Password visibility controls.
-A password recovery workflow.
-Further accessibility and responsive-design improvements.
-These are optional ideas and are not represented as completed features.
+
+## 🙏 Acknowledgment
+
+I would like to thank **ApexPlanet Software Pvt. Ltd.** for providing the opportunity to develop practical web development skills through hands-on internship tasks.
+
+This project represents my learning journey in PHP development, database integration, and security-conscious web application development.
+
 ---
-Internship Information
-Organization: ApexPlanet Software Pvt. Ltd.
-Program: Web Development Internship
-Project: InkSpace — Blog Management System
-Current Task: Task 5
-Primary Technologies: PHP, MySQL, HTML5, CSS3, JavaScript
-Development Environment: XAMPP and Visual Studio Code
-This project is developed for educational purposes as part of the ApexPlanet Web Development Internship.
----
-Acknowledgment
-Thank you to ApexPlanet Software Pvt. Ltd. for the opportunity to practice web development through progressive, hands-on internship tasks.
----
+
+
+
+**Developed by Goutam Rana**
+
+*Learning • Building • Improving*
+
