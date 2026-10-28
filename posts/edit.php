@@ -1,16 +1,29 @@
 <?php
 
+ini_set("session.use_strict_mode", "1");
 session_start();
 
 require_once "../config/database.php";
 
-// 1. Authentication check
+// 1. Check authentication
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../auth/login.php");
     exit();
 }
 
-// 2. Validate post ID
+// 2. Validate the logged-in user's ID
+$user_id = filter_var(
+    $_SESSION["user_id"],
+    FILTER_VALIDATE_INT,
+    ["options" => ["min_range" => 1]]
+);
+
+if ($user_id === false || $user_id === null) {
+    http_response_code(401);
+    exit("Invalid login session. Please log in again.");
+}
+
+// 3. Validate article ID
 $id = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT);
 
 if ($id === false || $id === null || $id < 1) {
@@ -18,8 +31,12 @@ if ($id === false || $id === null || $id < 1) {
     exit();
 }
 
-// 3. Generate CSRF token
-if (empty($_SESSION["csrf_token"])) {
+// 4. Generate CSRF token
+if (
+    !isset($_SESSION["csrf_token"]) ||
+    !is_string($_SESSION["csrf_token"]) ||
+    $_SESSION["csrf_token"] === ""
+) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 }
 
@@ -27,44 +44,55 @@ $message = "";
 $title = "";
 $content = "";
 
-// 4. Fetch existing post
+// 5. Fetch only an article owned by the logged-in user
 $stmt = $conn->prepare(
-    "SELECT id, title, content FROM posts WHERE id = ?"
+    "SELECT id, title, content
+     FROM posts
+     WHERE id = ? AND user_id = ?"
 );
 
-$stmt->bind_param("i", $id);
-$stmt->execute();
+if (!$stmt) {
+    error_log("Edit post fetch prepare failed: " . $conn->error);
+    http_response_code(500);
+    exit("Unable to load the article.");
+}
+
+$stmt->bind_param("ii", $id, $user_id);
+
+if (!$stmt->execute()) {
+    error_log("Edit post fetch failed: " . $stmt->error);
+    $stmt->close();
+    http_response_code(500);
+    exit("Unable to load the article.");
+}
 
 $result = $stmt->get_result();
 
 if ($result->num_rows !== 1) {
     $stmt->close();
-    header("Location: index.php");
-    exit();
+    http_response_code(404);
+    exit("Article not found or you do not have permission to edit it.");
 }
 
 $post = $result->fetch_assoc();
-
 $stmt->close();
 
-// Display existing post values
 $title = $post["title"];
 $content = $post["content"];
 
-// 5. Process update request
+// 6. Process update request
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // Validate CSRF token
     if (
         !isset($_POST["csrf_token"], $_SESSION["csrf_token"]) ||
         !is_string($_POST["csrf_token"]) ||
+        !is_string($_SESSION["csrf_token"]) ||
         !hash_equals($_SESSION["csrf_token"], $_POST["csrf_token"])
     ) {
         http_response_code(403);
         exit("Invalid security token. Please refresh the page and try again.");
     }
 
-    // Validate input types
     if (
         !isset($_POST["title"], $_POST["content"]) ||
         !is_string($_POST["title"]) ||
@@ -76,58 +104,54 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $title = trim($_POST["title"]);
         $content = trim($_POST["content"]);
 
-        // Validate required fields
-        if ($title === "" || $content === "") {
+if ($title === "" || $content === "") {
+    $message = "Please fill in all fields.";
 
-            $message = "Please fill in all fields.";
+} elseif (mb_strlen($title, "UTF-8") > 255) {
+    $message = "Title must not exceed 255 characters.";
 
-        } elseif (strlen($title) > 255) {
+} elseif (mb_strlen($content, "UTF-8") > 20000) {
+    $message = "Content must not exceed 20,000 characters.";
 
-            $message = "Title must not exceed 255 bytes.";
+} else {
 
-        } elseif (strlen($content) > 20000) {
-
-            $message = "Content is too long. Please keep it under 20,000 bytes.";
-
-        } else {
-
-            // 6. Update post using prepared statement
+            // 7. Update only the owner's article
             $stmt = $conn->prepare(
                 "UPDATE posts
                  SET title = ?, content = ?
-                 WHERE id = ?"
+                 WHERE id = ? AND user_id = ?"
             );
 
-            $stmt->bind_param(
-                "ssi",
-                $title,
-                $content,
-                $id
-            );
-
-            if ($stmt->execute()) {
-
-                $stmt->close();
-                $conn->close();
-
-                // Redirect after successful update
-                header("Location: index.php");
-                exit();
-
+            if (!$stmt) {
+                error_log("Update post prepare failed: " . $conn->error);
+                $message = "Unable to update the article. Please try again.";
             } else {
 
-                // Log technical details privately
-                error_log("Update post failed: " . $stmt->error);
+                $stmt->bind_param(
+                    "ssii",
+                    $title,
+                    $content,
+                    $id,
+                    $user_id
+                );
 
-                $message = "Unable to update the post. Please try again.";
+                if ($stmt->execute()) {
+                    $stmt->close();
+                    $conn->close();
+
+                    header("Location: index.php?updated=1");
+                    exit();
+                }
+
+                error_log("Update post execution failed: " . $stmt->error);
+                $message = "Unable to update the article. Please try again.";
+                $stmt->close();
             }
-
-            $stmt->close();
         }
     }
 }
 
-// 7. Escape HTML output
+// 8. Escape output
 function e($value) {
     return htmlspecialchars(
         (string) $value,
@@ -136,81 +160,184 @@ function e($value) {
     );
 }
 
+$username = (string) ($_SESSION["username"] ?? "Writer");
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Edit Post - ApexPlanet Task 4</title>
-
-    <link rel="stylesheet" href="../style.css">
-
+    <title>Edit Article — InkSpace</title>
+    <link rel="stylesheet" href="edit.css?v=1">
 </head>
 
 <body>
 
-<div class="container">
+<header class="editor-navbar">
+    <a href="index.php" class="editor-brand">
+        <span class="brand-mark">i.</span>
+        <span>InkSpace</span>
+    </a>
 
-    <h1>Edit Post</h1>
+    <div class="navbar-right">
+        <span class="writer-name">
+            Writing as <strong><?= e($username) ?></strong>
+        </span>
+        <a href="index.php" class="nav-back">Back to articles</a>
+    </div>
+</header>
 
-    <?php if ($message !== ""): ?>
+<main class="editor-main">
 
-        <p role="alert">
-            <?php echo e($message); ?>
+    <div class="editor-heading">
+        <span class="eyebrow">YOUR CREATIVE SPACE</span>
+        <h1>Refine your story<span>.</span></h1>
+        <p>
+            Every great article deserves another look.
+            Make your changes and save your work.
         </p>
+    </div>
 
-    <?php endif; ?>
+    <section class="editor-card">
 
-    <form method="POST" action="edit.php?id=<?php echo (int) $id; ?>">
+        <div class="editor-card-top">
+            <div>
+                <span class="status-dot"></span>
+                <span class="draft-label">ARTICLE EDITOR</span>
+            </div>
+            <span class="editor-badge">Editing article #<?= (int) $id ?></span>
+        </div>
 
-        <!-- CSRF protection -->
-        <input
-            type="hidden"
-            name="csrf_token"
-            value="<?php echo e($_SESSION["csrf_token"]); ?>"
-        >
+        <?php if ($message !== ""): ?>
+            <div class="editor-alert" role="alert">
+                <span class="alert-icon">!</span>
+                <span><?= e($message) ?></span>
+            </div>
+        <?php endif; ?>
 
-        <label for="title">Title</label>
+        <form method="POST" action="edit.php?id=<?= (int) $id ?>" id="articleForm">
 
-        <input
-            type="text"
-            id="title"
-            name="title"
-            maxlength="255"
-            value="<?php echo e($title); ?>"
-            required
-        >
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= e($_SESSION["csrf_token"]) ?>"
+            >
 
-        <label for="content">Content</label>
+            <div class="form-group">
+                <label for="title">ARTICLE TITLE</label>
 
-        <textarea
-            id="content"
-            name="content"
-            rows="8"
-            maxlength="20000"
-            required
-        ><?php echo e($content); ?></textarea>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    class="title-input"
+                    placeholder="Give your article a meaningful title..."
+                    maxlength="255"
+                    value="<?= e($title) ?>"
+                    required
+                >
 
-        <button type="submit">
-            Update Post
-        </button>
+                <div class="field-meta">
+                    <span>Make it clear, compelling, and memorable.</span>
+                    <span id="titleCount">0 / 255</span>
+                </div>
+            </div>
 
-    </form>
+            <div class="form-group content-group">
+                <label for="content">YOUR STORY</label>
 
-    <br>
+                <textarea
+                    id="content"
+                    name="content"
+                    class="content-input"
+                    placeholder="Start writing your thoughts here..."
+                    rows="12"
+                    maxlength="20000"
+                    required
+                ><?= e($content) ?></textarea>
 
-    <a href="index.php">Back to Posts</a>
+                <div class="field-meta">
+                    <span>Your ideas deserve to be expressed.</span>
+                    <span id="contentCount">0 / 20000</span>
+                </div>
+            </div>
 
-</div>
+            <div class="editor-footer">
+
+                <div class="editor-note">
+                    <span class="note-icon" aria-hidden="true">✓</span>
+                    Your changes will be saved to your article.
+                </div>
+
+                <div class="editor-actions">
+                    <a href="index.php" class="btn-cancel">Cancel</a>
+
+                    <button type="submit" class="btn-publish" id="saveButton">
+                        <span>Save Changes</span>
+                        <span aria-hidden="true">→</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </section>
+
+    <p class="editor-tip">
+        <span aria-hidden="true">✦</span>
+        Great writing gets better with every revision.
+    </p>
+
+</main>
+
+<footer class="editor-page-footer">
+    <p>© <?= date("Y") ?> InkSpace. A space for your ideas.</p>
+</footer>
+
+<script>
+    const titleInput = document.getElementById("title");
+    const contentInput = document.getElementById("content");
+    const titleCount = document.getElementById("titleCount");
+    const contentCount = document.getElementById("contentCount");
+    const articleForm = document.getElementById("articleForm");
+    const saveButton = document.getElementById("saveButton");
+
+function updateCounters() {
+    titleCount.textContent =
+        `${Array.from(titleInput.value).length} / 255`;
+
+    contentCount.textContent =
+        `${Array.from(contentInput.value).length} / 20000`;
+}
+
+    titleInput.addEventListener("input", updateCounters);
+    contentInput.addEventListener("input", updateCounters);
+    updateCounters();
+
+    articleForm.addEventListener("submit", function (event) {
+        if (
+            titleInput.value.trim() === "" ||
+            contentInput.value.trim() === ""
+        ) {
+            event.preventDefault();
+            alert("Please fill in both the title and content.");
+            return;
+        }
+
+        if (!articleForm.checkValidity()) {
+            return;
+        }
+
+        saveButton.disabled = true;
+        saveButton.querySelector("span").textContent = "Saving...";
+    });
+</script>
 
 </body>
-
 </html>
 
 <?php

@@ -1,0 +1,18 @@
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Database backups
+*.sql
+*.sql.gz
+
+# Log files
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Local editor settings
+.vscode/

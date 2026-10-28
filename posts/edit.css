@@ -1,0 +1,736 @@
+/* =========================================
+   InkSpace — Edit Article Page
+   File: posts/edit.css
+   ========================================= */
+
+:root {
+    --primary: #635bff;
+    --primary-dark: #5046e5;
+    --primary-light: #f0efff;
+    --text: #191a2b;
+    --muted: #74788a;
+    --border: #e7e8f0;
+    --background: #f7f8fc;
+    --white: #ffffff;
+    --success: #16845b;
+    --shadow: 0 15px 45px rgba(30, 35, 75, 0.07);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(ellipse at 12% 8%, rgba(99, 91, 255, 0.06), transparent 32%),
+        var(--background);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(99, 91, 255, 0.25);
+    outline-offset: 3px;
+}
+
+/* =========================================
+   Navigation
+   ========================================= */
+
+.editor-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 0 max(28px, calc((100% - 1120px) / 2));
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(16px);
+}
+
+.editor-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    color: var(--text);
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.brand-mark {
+    width: 39px;
+    height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #8178ff, #5549e8);
+    color: #fff;
+    font-size: 21px;
+    box-shadow: 0 5px 13px rgba(99, 91, 255, 0.23);
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 22px;
+}
+
+.writer-name {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.writer-name strong {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.nav-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 39px;
+    padding: 0 15px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--white);
+    color: #4d5264;
+    font-size: 12px;
+    font-weight: 700;
+    transition: 0.2s ease;
+}
+
+.nav-back:hover {
+    border-color: #d3ceff;
+    background: #f8f7ff;
+    color: var(--primary);
+}
+
+/* =========================================
+   Main Layout
+   ========================================= */
+
+.editor-main {
+    width: min(850px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 45px 0 50px;
+}
+
+/* =========================================
+   Heading
+   ========================================= */
+
+.editor-heading {
+    margin-bottom: 28px;
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: 11px;
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.editor-heading h1 {
+    margin-bottom: 12px;
+    color: var(--text);
+    font-size: clamp(32px, 5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -1.7px;
+    line-height: 1.2;
+}
+
+.editor-heading h1 span {
+    color: var(--primary);
+}
+
+.editor-heading p {
+    max-width: 600px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* =========================================
+   Editor Card
+   ========================================= */
+
+.editor-card {
+    overflow: hidden;
+    padding: 0 32px 30px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--white);
+    box-shadow: var(--shadow);
+}
+
+.editor-card-top {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin: 0 -32px 29px;
+    padding: 17px 32px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(110deg, #fff, #fbfaff);
+}
+
+.editor-card-top > div {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #6d63f5;
+    box-shadow: 0 0 0 4px #eeedff;
+}
+
+.draft-label {
+    color: #565a70;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.editor-badge {
+    padding: 7px 11px;
+    border: 1px solid #e4e1ff;
+    border-radius: 8px;
+    background: var(--primary-light);
+    color: #5b53cf;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* =========================================
+   Error Message
+   ========================================= */
+
+.editor-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-bottom: 24px;
+    padding: 14px 15px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fff5f5;
+    color: #b42318;
+    font-size: 12px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.alert-icon {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #fee2e2;
+    font-weight: 800;
+}
+
+/* =========================================
+   Form Fields
+   ========================================= */
+
+#articleForm {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 28px;
+}
+
+.form-group > label {
+    display: block;
+    margin-bottom: 11px;
+    color: #33364a;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.title-input,
+.content-input {
+    display: block;
+    width: 100%;
+    border: 1px solid #dfe1eb;
+    border-radius: 10px;
+    outline: none;
+    background: #fff;
+    color: var(--text);
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.title-input {
+    min-height: 55px;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.title-input::placeholder,
+.content-input::placeholder {
+    color: #a2a6b4;
+    font-weight: 400;
+}
+
+.title-input:hover,
+.content-input:hover {
+    border-color: #c9c6f2;
+}
+
+.title-input:focus,
+.content-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 91, 255, 0.09);
+}
+
+.field-meta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 9px;
+    color: #9296a5;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+#titleCount,
+#contentCount {
+    flex-shrink: 0;
+    color: #7e8293;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* =========================================
+   Article Content
+   ========================================= */
+
+.content-group {
+    margin-bottom: 25px;
+}
+
+.content-input {
+    min-height: 320px;
+    padding: 19px;
+    resize: vertical;
+    font-size: 14px;
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================
+   Footer and Buttons
+   ========================================= */
+
+.editor-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.editor-note {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.note-icon {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #e7f7ef;
+    color: var(--success);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.editor-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-cancel,
+.btn-publish {
+    min-height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 19px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 750;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.btn-cancel {
+    border: 1px solid #e0e2ea;
+    background: #fff;
+    color: #55596a;
+}
+
+.btn-cancel:hover {
+    background: #f7f8fc;
+    border-color: #c9cbd7;
+}
+
+.btn-publish {
+    border: 1px solid var(--primary);
+    background: linear-gradient(135deg, #746aff, #5548e8);
+    color: #fff;
+    box-shadow: 0 5px 14px rgba(99, 91, 255, 0.2);
+}
+
+.btn-publish:hover:not(:disabled) {
+    background: linear-gradient(135deg, #6258f0, #493dd7);
+    box-shadow: 0 8px 18px rgba(99, 91, 255, 0.27);
+    transform: translateY(-1px);
+}
+
+.btn-publish > span:last-child {
+    font-size: 18px;
+}
+
+.btn-publish:disabled {
+    cursor: wait;
+    opacity: 0.7;
+    box-shadow: none;
+}
+
+/* =========================================
+   Tip and Page Footer
+   ========================================= */
+
+.editor-tip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 22px;
+    color: #85899a;
+    font-size: 11px;
+    text-align: center;
+}
+
+.editor-tip > span {
+    color: var(--primary);
+    font-size: 15px;
+}
+
+.editor-page-footer {
+    padding: 23px 20px;
+    border-top: 1px solid var(--border);
+    background: #fff;
+    text-align: center;
+}
+
+.editor-page-footer p {
+    color: #85899a;
+    font-size: 11px;
+}
+
+/* =========================================
+   Tablet
+   ========================================= */
+
+@media (max-width: 760px) {
+    .editor-navbar {
+        padding-right: 22px;
+        padding-left: 22px;
+    }
+
+    .editor-main {
+        padding-top: 35px;
+    }
+
+    .editor-card {
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+
+    .editor-card-top {
+        margin-right: -24px;
+        margin-left: -24px;
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+
+    .editor-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .editor-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+/* =========================================
+   Mobile
+   ========================================= */
+
+@media (max-width: 520px) {
+    .editor-navbar {
+        min-height: 68px;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 12px 16px;
+    }
+
+    .editor-brand {
+        gap: 8px;
+        font-size: 20px;
+    }
+
+    .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        font-size: 19px;
+    }
+
+    .navbar-right {
+        gap: 8px;
+    }
+
+    .writer-name {
+        display: none;
+    }
+
+    .nav-back {
+        min-height: 35px;
+        padding: 0 10px;
+        font-size: 10px;
+    }
+
+    .editor-main {
+        width: calc(100% - 26px);
+        padding-top: 27px;
+        padding-bottom: 35px;
+    }
+
+    .editor-heading {
+        margin-bottom: 22px;
+    }
+
+    .eyebrow {
+        font-size: 9px;
+        letter-spacing: 1.5px;
+    }
+
+    .editor-heading h1 {
+        font-size: 32px;
+        letter-spacing: -1.1px;
+    }
+
+    .editor-heading p {
+        font-size: 12px;
+    }
+
+    .editor-card {
+        padding: 0 16px 21px;
+        border-radius: 14px;
+    }
+
+    .editor-card-top {
+        min-height: 65px;
+        gap: 8px;
+        margin: 0 -16px 23px;
+        padding: 14px 16px;
+    }
+
+    .draft-label {
+        font-size: 9px;
+        letter-spacing: 0.6px;
+    }
+
+    .editor-badge {
+        padding: 6px 8px;
+        font-size: 9px;
+    }
+
+    .form-group {
+        margin-bottom: 23px;
+    }
+
+    .title-input {
+        min-height: 50px;
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .content-input {
+        min-height: 260px;
+        padding: 14px;
+        font-size: 13px;
+    }
+
+    .field-meta {
+        gap: 8px;
+        font-size: 9px;
+    }
+
+    #titleCount,
+    #contentCount {
+        font-size: 9px;
+    }
+
+    .editor-footer {
+        gap: 18px;
+        padding-top: 20px;
+    }
+
+    .editor-note {
+        font-size: 10px;
+    }
+
+    .editor-actions {
+        gap: 9px;
+    }
+
+    .btn-cancel,
+    .btn-publish {
+        min-height: 43px;
+        gap: 8px;
+        padding: 0 13px;
+        font-size: 11px;
+    }
+
+    .btn-publish {
+        flex: 1;
+    }
+
+    .editor-tip {
+        font-size: 10px;
+    }
+}
+
+/* =========================================
+   Very Small Screens
+   ========================================= */
+
+@media (max-width: 350px) {
+    .editor-navbar {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .editor-brand {
+        font-size: 18px;
+    }
+
+    .nav-back {
+        padding: 0 8px;
+        font-size: 9px;
+    }
+
+    .editor-heading h1 {
+        font-size: 28px;
+    }
+
+    .editor-card {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .editor-card-top {
+        margin-right: -12px;
+        margin-left: -12px;
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .editor-badge {
+        padding: 5px 6px;
+        font-size: 8px;
+    }
+
+    .btn-cancel,
+    .btn-publish {
+        padding: 0 10px;
+        font-size: 10px;
+    }
+}
+
+/* =========================================
+   Reduced Motion
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
